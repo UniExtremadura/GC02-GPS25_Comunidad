@@ -49,3 +49,24 @@ class ComunidadController(APIView):
         except Exception as e:
             traceback.print_exc() # Muestra el error real en tu consola
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+    def put(self, request, idComunidad=None):
+        """
+        Realiza PUT comunidad/ (Actualizar una comunidad existent)
+        """
+
+        # Comprueba que la url tenga un idComunidad válido
+        if not idComunidad:
+            return Response({"error": "Falta idComunidad en la URL para actualizar"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Se cogen los datos del body para hacer la actualización
+        datos_entrada = request.data
+
+        try:
+            # Llama al método del DAO para actualizar la comunidad
+            comunidad_actualizada = ComunidadDAO.actualizar_comunidad(idComunidad, datos_entrada)
+            return Response(dataclasses.asdict(comunidad_actualizada), status=status.HTTP_200_OK)
+        except Exception as e:
+            traceback.print_exc()
+            return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
+

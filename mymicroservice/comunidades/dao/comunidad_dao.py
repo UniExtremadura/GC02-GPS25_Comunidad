@@ -110,3 +110,29 @@ class ComunidadDAO:
             return ComunidadDAO._to_dto(modelo)
         except Comunidad.DoesNotExist:
             raise Exception(f"Comunidad con id {comunidad} no encontrada.")
+        
+    @staticmethod
+    def actualizar_comunidad(comunidad: str, datos: dict) -> ComunidadDTO:
+        """
+        Actualiza una comunidad específica.
+        """
+        try:
+            # 1. Busca el objeto a actualizar
+            comunidad = Comunidad.objects.get(idComunidad=comunidad)
+
+            # 2. Actualiza los campos (solo los que vengan en 'datos')
+            # Usamos .get(key, default) para no borrar campos si no vienen
+            comunidad.nombreComunidad = datos.get('nombreComunidad', comunidad.nombreComunidad)
+            comunidad.descComunidad = datos.get('descComunidad', comunidad.descComunidad)
+            comunidad.rutaImagen = datos.get('rutaImagen', comunidad.rutaImagen)
+            
+            if 'palabrasVetadas' in datos:
+                comunidad.palabrasVetadas = ','.join(datos.get('palabrasVetadas', []))
+
+            # 3. Guarda en la BD
+            comunidad.save()
+            
+            # 4. Devuelve el DTO actualizado
+            return ComunidadDAO._to_dto(comunidad)
+        except Comunidad.DoesNotExist:
+            raise Exception(f"Comunidad con id {comunidad} no encontrada.")

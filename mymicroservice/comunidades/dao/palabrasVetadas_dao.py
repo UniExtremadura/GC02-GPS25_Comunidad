@@ -25,6 +25,25 @@ class PalabrasVetadasDAO:
         return ",".join(lista)
 
     @staticmethod
+    def get_palabras_vetadas(idComunidad: int) -> PalabrasVetadasDTO:
+        """
+            Obtiene la lista de palabras vetadas de una comunidad específica.
+        """
+        
+        # Si la url no tiene idComunidad, lanza excepción
+        if not idComunidad:
+            raise Exception("Falta id de la Comunidad")
+        
+        # Obtiene la comunidad con el id especificado
+        comunidad = Comunidad.objects.get(pk=idComunidad)
+        
+        # Usa la función auxiliar para convertir el string a lista
+        lista_palabras = PalabrasVetadasDAO._string_to_list(comunidad.palabrasVetadas)
+        
+        # Devuelve el DTO con la lista de palabras
+        return PalabrasVetadasDTO(palabras=lista_palabras)
+
+    @staticmethod
     def add_palabras_vetadas(idComunidad: int, nuevas_palabras: List[str]) -> PalabrasVetadasDTO:
         """
         Añade nuevas palabras vetadas a una comunidad específica.

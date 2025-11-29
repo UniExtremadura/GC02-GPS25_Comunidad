@@ -7,6 +7,25 @@ import dataclasses
 
 class PalabrasVetadasController(APIView):
 
+    def get(self, request, idComunidad):
+        """
+        GET /comunidad/<idComunidad>/palabras-vetadas/
+        Obtiene la lista de palabras vetadas para una comunidad específica.
+        """
+        if not idComunidad: # Comprobamos que se ha pasado idComunidad en la URL
+             return Response({"error": "Falta idComunidad en la URL"}, status=status.HTTP_400_BAD_REQUEST)
+         
+        try:    # Verificamos que la comunidad existe, si no, salta una excepción
+            Comunidad.objects.get(idComunidad=idComunidad)
+        except Comunidad.DoesNotExist:
+            return Response({"error": f"Comunidad con id {idComunidad} no encontrada."}, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            dto = PalabrasVetadasDAO.get_palabras_vetadas(idComunidad)
+            return Response(dataclasses.asdict(dto), status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
+
     def post(self, request, idComunidad):
         """ 
         POST /comunidad/<idComunidad>/palabras-vetadas/

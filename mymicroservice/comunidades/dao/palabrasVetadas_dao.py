@@ -67,3 +67,17 @@ class PalabrasVetadasDAO:
         
         return PalabrasVetadasDTO(palabras=lista_final)
 
+    @staticmethod
+    def modificar_palabras_vetadas(idComunidad: int, nueva_lista_completa: List[str]) -> PalabrasVetadasDTO:
+        """
+        Modifica la lista completa de palabras vetadas de una comunidad.
+        """
+        comunidad = Comunidad.objects.get(pk=idComunidad)
+        
+        # Preparamos la nueva lista para sustituir la anterior
+        lista_limpia = [p.strip() for p in nueva_lista_completa if p.strip()]
+        
+        comunidad.palabrasVetadas = PalabrasVetadasDAO._list_to_string(lista_limpia)
+        comunidad.save()
+        
+        return PalabrasVetadasDTO(palabras=lista_limpia)

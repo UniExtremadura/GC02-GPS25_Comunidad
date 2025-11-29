@@ -29,7 +29,30 @@ class PalabrasVetadasController(APIView):
             return Response(dataclasses.asdict(dto), status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        
+
+    def put(self, request, idComunidad):
+        """
+        PUT /comunidad/<idComunidad>/palabras-vetadas/
+        Reemplaza toda la lista de palabras vetadas de la comunidad.
+        """
+        if not idComunidad: # Comprobamos que se ha pasado idComunidad en la URL
+             return Response({"error": "Falta idComunidad en la URL"}, status=status.HTTP_400_BAD_REQUEST)
+         
+        try:    # Verificamos que la comunidad existe, si no, salta una excepción
+            Comunidad.objects.get(idComunidad=idComunidad)
+        except Comunidad.DoesNotExist:
+            return Response({"error": f"Comunidad con id {idComunidad} no encontrada."}, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            nueva_lista = request.data.get('palabras', [])
+            if not isinstance(nueva_lista, list):
+                 return Response({"error": "Se espera una lista en el campo 'palabras'"}, status=status.HTTP_400_BAD_REQUEST)
+
+            dto = PalabrasVetadasDAO.modificar_palabras_vetadas(idComunidad, nueva_lista)
+            return Response(dataclasses.asdict(dto), status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
     def delete(self, request, idComunidad):
         """
         DELETE /comunidad/<idComunidad>/palabras-vetadas/

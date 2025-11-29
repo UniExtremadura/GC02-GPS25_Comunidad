@@ -49,3 +49,21 @@ class PalabrasVetadasDAO:
         comunidad.save()
                 
         return PalabrasVetadasDTO(palabras=lista_final)
+    
+    @staticmethod
+    def eliminar_palabras_vetadas(idComunidad: int, palabras_borrar: List[str]) -> PalabrasVetadasDTO:
+        """
+        Elimina palabras vetadas específicas de una comunidad.
+        """
+        comunidad = Comunidad.objects.get(pk=idComunidad)
+        actuales = PalabrasVetadasDAO._string_to_list(comunidad.palabrasVetadas)
+        
+        # Filtramos: nos quedamos con las que NO estén en la lista de borrar
+        borrar = set(p.strip() for p in palabras_borrar)
+        lista_final = [p for p in actuales if p.strip() not in borrar]
+        
+        comunidad.palabrasVetadas = PalabrasVetadasDAO._list_to_string(lista_final)
+        comunidad.save()
+        
+        return PalabrasVetadasDTO(palabras=lista_final)
+
